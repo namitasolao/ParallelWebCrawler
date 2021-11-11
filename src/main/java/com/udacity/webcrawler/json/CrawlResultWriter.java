@@ -29,18 +29,18 @@ public final class CrawlResultWriter {
    *
    * @param path the file path where the crawl result data should be written.
    */
-  public void write(Path path) {
+  public void write(Path path) throws IOException {
     // This is here to get rid of the unused variable warning.
     Objects.requireNonNull(path);
+
+    FileWriter writer = new FileWriter(path.toFile());
+    BufferedWriter bufferedWriter = new BufferedWriter(writer);
+
     try {
-      FileWriter writer = new FileWriter(path.toFile());
-      BufferedWriter bufferedWriter = new BufferedWriter(writer);
       write(bufferedWriter);
-    } catch (IOException e) {
-      System.out.println(
-              "IOException when writing tp path : " +
-                      path + ", Exception : " + e.getMessage()
-      );
+    } finally {
+      writer.close();
+      bufferedWriter.close();
     }
   }
 

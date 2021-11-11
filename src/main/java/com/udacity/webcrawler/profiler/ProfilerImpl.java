@@ -69,20 +69,20 @@ final class ProfilerImpl implements Profiler {
   }
 
   @Override
-  public void writeData(Path path) {
+  public void writeData(Path path) throws IOException {
+    FileWriter fileWriter = new FileWriter(path.toFile(), true);
+    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
     try {
-      FileWriter fileWriter = new FileWriter(path.toFile(), true);
-      BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
       state.write(bufferedWriter);
-
-      bufferedWriter.close();
-      fileWriter.close();
     } catch (IOException e) {
       System.out.println(
               "IOException when writing tp path : " +
                       path + ", Exception : " + e.getMessage()
       );
+    } finally {
+      bufferedWriter.close();
+      fileWriter.close();
     }
   }
 
