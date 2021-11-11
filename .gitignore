@@ -1,0 +1,6 @@
+.idea/
+target/
+*.iml
+profileData.txt
+profileData2.txt
+profileTestData.txt

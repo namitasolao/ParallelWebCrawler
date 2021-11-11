@@ -1,0 +1,73 @@
+Written Questions
+
+Q1. Run the web crawler using the configurations located at src/main/config/written_question_1a.json and
+    src/main/config/written_question_1b.json. The only difference between these configurations is that one always uses
+    the sequential crawler and the other always uses the parallel crawler. Inspect the profile output in
+    profileData.txt.
+
+    If you are using a multi-processor computer, you should notice that SequentialWebCrawler#crawl and
+    ParallelWebCrawler#crawl took about the same amount of time, but PageParserImpl#parse took much longer when run with
+    the ParallelWebCrawler.
+
+    Why did the parser take more time when run with ParallelWebCrawler?
+
+Ans: Because parallelism wasn't defined in the configuration file, the parallel crawler ran everything sequentially and
+     had to spend more time setting up the threads. The Sequential crawler doesn't have to setup any threads and thus
+     seems faster.
+
+
+Q2. Your manager ran your crawler on her old personal computer, using the configurations from Q1, and she notices that
+    the sequential crawler actually outperforms the parallel crawler. She would like to know why.
+
+    (a) Suggest one reason why the sequential web crawler was able to read more web pages than the parallel crawler.
+        (Hint: Try setting "parallelism" to 1 in the JSON configs to simulate your manager's computer.)
+
+   Ans: Sequential crawler doesn't have to initialize any threads. The parallel crawler needs to. The older systems did
+        not have multi-core processors and thus couldn't truly parallelize.
+
+    (b) Suggest one scenario in which the parallel web crawler will almost certainly perform better than the sequential
+        crawler. Why will it perform better?
+
+   Ans: The parallel web crawler will perform better with when max parallelism is used, i.e. either the parallelism
+        number is high enough or the machine has a high number of cores.
+
+
+Q3. Analyze your method profiler through the lens of Aspect Oriented Programming, by answering the following questions:
+
+    (a) What cross-cutting concern is being addressed by the com.udacity.webcrawler.profiler.Profiler class?
+
+   Ans: The Profiler class is independent of the method that is being profiled. This helps keep the business logic free
+        of any profiler specific code. We can thus test them independently of each other and also have additional tests
+        to ensure the function speeds are great.
+
+    (b) What are the join points of the Profiler in the web crawler program?
+
+   Ans: The PageParser is the only join point between them, we are using dynamic proxy to return a proxied object
+        from the profiler.
+
+Q4. Identify three (3) different design patterns used in this project, and explain which interfaces, classes, and/or
+    libraries use or implement those design patterns.
+
+    For each pattern, name one thing about the pattern that you LIKED, and one thing you DISLIKED. If you did not like
+    anything, you can name two things you disliked.
+
+Ans : Follow are the 3 design patterns used in this project
+
+1. Builder
+This is used with the CrawlerConfiguration, when having Jackson build it for us.
+Like : Makes it easier to test
+Dislike : The user knows about the compulsory fields only after calling build. A constructor would make these obvious
+          when writing the code.
+
+2. Factory
+I used this with the WordCountTask, writing a new WordCountTaskFactory.
+Like : Simplified creation of the WordTask instances when scheduling additional parallel tasks.
+Dislike : Setting up the dependencies for the factory pattern wasn't straight forward. Since we wanted to make this
+          Factor injectable, I had to ensure all the dependencies were provided by the dependency graph.
+
+3. Singleton
+We have multiple singleton being provided within the dependency injection graph.
+Like : I can just inject an instance and know that there is only a single instance of this object at runtime.
+Dislike : Since Guice makes sure its Singletons are threadsafe, we have no issues, but not all singletons are threadsafe.
+
+
